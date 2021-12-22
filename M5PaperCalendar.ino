@@ -44,12 +44,21 @@
   V0.2  22.11.2021: Added the pure clock page
   V0.3  27.11.2021: Added the weather page
   V0.4  05.12.2021: Small bug fixes, show "+" if read data was ok
-  V0.5  18.12.2021: Tuned the mini calendar, renamed "pure clock" to "today"
+  V0.5  18.12.2021: Tuned the mini calendar, renamed "pure clock" to "today", some bug fixes
+  V0.6  22.12.2021: Worked on the today page
+
+
+  Important note:
+  ---------------
+  Due to changes in arduino-esp32 version 2.0.1.
+  change line 67 in M5EPD.cpp like this:
+		  Wire.begin(21, 22, (uint32_t)400000);
+
 
 
  *********************************************************************/
 
-#define FIRMWARE "0.5 - 2021-12-18"
+#define FIRMWARE "0.6 - 2021-12-22"
 
  /**************************************************************************************
  **     Libraries
@@ -78,9 +87,9 @@ IPAddress subnet(255, 255, 255, 0);
 
 #define HOSTNAME "M5PaperCalendarWeatherClock"
 
-#define MYBLACK WHITE
-#define MYWHITE BLACK
-#define MYGREY M5EPD_Canvas::G9
+#define MYBLACK M5EPD_Canvas::G15
+#define MYWHITE M5EPD_Canvas::G0	
+#define MYGREY M5EPD_Canvas::G5
 
 // time and date vars
 struct tm tm;
@@ -186,11 +195,12 @@ HTTPClient http;
 WiFiClient client;
 
 // include all the helpers
+#include "Icons.h"
 #include "myWiFi.h"
 #include "myCalendar.h"
 #include "myUtils.h"
-#include "myToday.h"
 #include "myWeather.h"
+#include "myToday.h"
 
 
 
@@ -219,6 +229,7 @@ void setup() {
 
 	setupTime();
 	M5.RTC.getTime(&currentTime);
+	M5.RTC.getDate(&currentDate);
 
 	// calendar page
 	sideBar.createCanvas(300, 540);
@@ -247,6 +258,7 @@ void setup() {
 	myToday.fillCanvas(MYWHITE);
 	myToday.pushCanvas(0, 0, UPDATE_MODE_GC16);
 	myToday.deleteCanvas();
+	printFrame();
 
 }
 ///////////////////// End Setup /////////////////////////////////////////////////////////////////////////
@@ -263,13 +275,15 @@ void loop() {
 
 	// check the button
 	if (M5.BtnL.wasPressed()) {
-		page = 1; // button to the left  --> Pure Clock
+		page = 1; // button to the left  --> today
 		myToday.createCanvas(960, 540);
 		myToday.fillCanvas(MYWHITE);
 		myToday.pushCanvas(0, 0, UPDATE_MODE_GC16);
 		myToday.deleteCanvas();
+		printFrame();
 		printTime();
 		printDate();
+		printWeather();
 		Serial.println(page);
 	}
 	if (M5.BtnP.wasPressed()) {
@@ -311,6 +325,10 @@ void loop() {
 
 	if (currentTime.hour != oldHour) {
 		oldHour = currentTime.hour;
+		if (page == 1) {
+			readWeather();
+			printWeather();
+		}
 		if (page == 2) eventList();
 		if (page == 3) {
 			getSHT30Values();

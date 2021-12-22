@@ -3,7 +3,7 @@
 // all the functions for weather
 
 #pragma once
-#include "Icons.h"
+//#include "Icons.h"
 #include "myUtils.h"
 
 
@@ -24,7 +24,7 @@ bool GetOpenWeatherJsonDoc(DynamicJsonDocument& doc) {
 	uri += "&units=metric&lang=de&exclude=minutely,alerts";
 	uri += "&appid=" + (String)APIKEY;
 
-	if (!checkWiFi) connectWiFi();
+	if (!checkWiFi()) connectWiFi();
 
 	client.stop();
 	http.end();
@@ -141,16 +141,16 @@ void drawHead() {
 }
 
 /* Draw one icon from the binary data */
-void drawIcon(int x, int y, const uint16_t* icon, int dx = 64, int dy = 64, bool highContrast = false) {
+void drawIcon(M5EPD_Canvas& canvas1, int x, int y, const uint16_t* icon, int dx = 64, int dy = 64, bool highContrast = false) {
 	for (int yi = 0; yi < dy; yi++) {
 		for (int xi = 0; xi < dx; xi++) {
 			uint16_t pixel = icon[yi * dx + xi];
 
 			if (highContrast) {
-				if (15 - (pixel / 4096) > 0) myWeather.drawPixel(x + xi, y + yi, MYBLACK);
+				if (15 - (pixel / 4096) > 0) canvas1.drawPixel(x + xi, y + yi, MYBLACK);
 			}
 			else {
-				myWeather.drawPixel(x + xi, y + yi, 15 - (pixel / 4096));
+				canvas1.drawPixel(x + xi, y + yi, 15 - (pixel / 4096));
 			}
 		}
 	}
@@ -166,25 +166,25 @@ void drawWeatherInfo(int x, int y, int dx, int dy) {
 	int iconX = x + dx / 2 - 32;
 	int iconY = y + 45;
 
-	if (icon == "01d") drawIcon(iconX, iconY, (uint16_t*)image_data_01d, 64, 64, true);
-	else if (icon == "01n") drawIcon(iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
-	else if (icon == "02d") drawIcon(iconX, iconY, (uint16_t*)image_data_02d, 64, 64, true);
-	else if (icon == "02n") drawIcon(iconX, iconY, (uint16_t*)image_data_02n, 64, 64, true);
-	else if (icon == "03d") drawIcon(iconX, iconY, (uint16_t*)image_data_03d, 64, 64, true);
-	else if (icon == "03n") drawIcon(iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
-	else if (icon == "04d") drawIcon(iconX, iconY, (uint16_t*)image_data_04d, 64, 64, true);
-	else if (icon == "04n") drawIcon(iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
-	else if (icon == "09d") drawIcon(iconX, iconY, (uint16_t*)image_data_09d, 64, 64, true);
-	else if (icon == "09n") drawIcon(iconX, iconY, (uint16_t*)image_data_09n, 64, 64, true);
-	else if (icon == "10d") drawIcon(iconX, iconY, (uint16_t*)image_data_10d, 64, 64, true);
-	else if (icon == "10n") drawIcon(iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
-	else if (icon == "11d") drawIcon(iconX, iconY, (uint16_t*)image_data_11d, 64, 64, true);
-	else if (icon == "11n") drawIcon(iconX, iconY, (uint16_t*)image_data_11n, 64, 64, true);
-	else if (icon == "13d") drawIcon(iconX, iconY, (uint16_t*)image_data_13d, 64, 64, true);
-	else if (icon == "13n") drawIcon(iconX, iconY, (uint16_t*)image_data_13n, 64, 64, true);
-	else if (icon == "50d") drawIcon(iconX, iconY, (uint16_t*)image_data_50d, 64, 64, true);
-	else if (icon == "50n") drawIcon(iconX, iconY, (uint16_t*)image_data_50n, 64, 64, true);
-	else drawIcon(iconX, iconY, (uint16_t*)image_data_unknown, 64, 64, true);
+	if (icon == "01d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_01d, 64, 64, true);
+	else if (icon == "01n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
+	else if (icon == "02d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_02d, 64, 64, true);
+	else if (icon == "02n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_02n, 64, 64, true);
+	else if (icon == "03d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_03d, 64, 64, true);
+	else if (icon == "03n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
+	else if (icon == "04d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_04d, 64, 64, true);
+	else if (icon == "04n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
+	else if (icon == "09d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_09d, 64, 64, true);
+	else if (icon == "09n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_09n, 64, 64, true);
+	else if (icon == "10d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_10d, 64, 64, true);
+	else if (icon == "10n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
+	else if (icon == "11d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_11d, 64, 64, true);
+	else if (icon == "11n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_11n, 64, 64, true);
+	else if (icon == "13d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_13d, 64, 64, true);
+	else if (icon == "13n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_13n, 64, 64, true);
+	else if (icon == "50d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_50d, 64, 64, true);
+	else if (icon == "50n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_50n, 64, 64, true);
+	else drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_unknown, 64, 64, true);
 
 	//myWeather.drawCentreString(weather.hourlyMain[0], x + dx / 2, y + 110, 1);
 	myWeather.setTextArea(x + 4, y + 110, dx - 4, 70);
@@ -205,10 +205,10 @@ void drawSunInfo(int x, int y, int dx, int dy) {
 	myWeather.drawLine(x, y + 35, x + dx, y + 35, MYBLACK);
 
 	myWeather.setTextSize(36);
-	drawIcon(x + 25, y + 55, (uint16_t*)SUNRISE64x64);
+	drawIcon(myWeather, x + 25, y + 55, (uint16_t*)SUNRISE64x64);
 	myWeather.drawString(getHourMinString(weather.sunrise), x + 105, y + 80, 1);
 
-	drawIcon(x + 25, y + 150, (uint16_t*)SUNSET64x64);
+	drawIcon(myWeather, x + 25, y + 150, (uint16_t*)SUNSET64x64);
 	myWeather.drawString(getHourMinString(weather.sunset), x + 105, y + 175, 1);
 }
 
@@ -292,9 +292,9 @@ void drawM5PaperInfo(int x, int y, int dx, int dy) {
 
 	myWeather.setTextSize(36);
 	myWeather.setTextDatum(TL_DATUM);
-	drawIcon(x + 35, y + 140, (uint16_t*)TEMPERATURE64x64);
+	drawIcon(myWeather, x + 35, y + 140, (uint16_t*)TEMPERATURE64x64);
 	myWeather.drawString(String(sht30Temperatur) + " \u00b0C", x + 35, y + 210, 1);
-	drawIcon(x + 145, y + 140, (uint16_t*)HUMIDITY64x64);
+	drawIcon(myWeather, x + 145, y + 140, (uint16_t*)HUMIDITY64x64);
 	myWeather.drawString(String(sht30Humidity) + "%", x + 150, y + 210, 1);
 
 }
@@ -313,25 +313,25 @@ void drawDaily(int x, int y, int dx, int dy, Weather& weather, int index) {
 	int iconX = x + dx / 2 - 32;
 	int iconY = y + 20;
 
-	if (icon == "01d") drawIcon(iconX, iconY, (uint16_t*)image_data_01d, 64, 64, true);
-	else if (icon == "01n") drawIcon(iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
-	else if (icon == "02d") drawIcon(iconX, iconY, (uint16_t*)image_data_02d, 64, 64, true);
-	else if (icon == "02n") drawIcon(iconX, iconY, (uint16_t*)image_data_02n, 64, 64, true);
-	else if (icon == "03d") drawIcon(iconX, iconY, (uint16_t*)image_data_03d, 64, 64, true);
-	else if (icon == "03n") drawIcon(iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
-	else if (icon == "04d") drawIcon(iconX, iconY, (uint16_t*)image_data_04d, 64, 64, true);
-	else if (icon == "04n") drawIcon(iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
-	else if (icon == "09d") drawIcon(iconX, iconY, (uint16_t*)image_data_09d, 64, 64, true);
-	else if (icon == "09n") drawIcon(iconX, iconY, (uint16_t*)image_data_09n, 64, 64, true);
-	else if (icon == "10d") drawIcon(iconX, iconY, (uint16_t*)image_data_10d, 64, 64, true);
-	else if (icon == "10n") drawIcon(iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
-	else if (icon == "11d") drawIcon(iconX, iconY, (uint16_t*)image_data_11d, 64, 64, true);
-	else if (icon == "11n") drawIcon(iconX, iconY, (uint16_t*)image_data_11n, 64, 64, true);
-	else if (icon == "13d") drawIcon(iconX, iconY, (uint16_t*)image_data_13d, 64, 64, true);
-	else if (icon == "13n") drawIcon(iconX, iconY, (uint16_t*)image_data_13n, 64, 64, true);
-	else if (icon == "50d") drawIcon(iconX, iconY, (uint16_t*)image_data_50d, 64, 64, true);
-	else if (icon == "50n") drawIcon(iconX, iconY, (uint16_t*)image_data_50n, 64, 64, true);
-	else drawIcon(iconX, iconY, (uint16_t*)image_data_unknown, 64, 64, true);
+	if (icon == "01d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_01d, 64, 64, true);
+	else if (icon == "01n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
+	else if (icon == "02d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_02d, 64, 64, true);
+	else if (icon == "02n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_02n, 64, 64, true);
+	else if (icon == "03d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_03d, 64, 64, true);
+	else if (icon == "03n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
+	else if (icon == "04d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_04d, 64, 64, true);
+	else if (icon == "04n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
+	else if (icon == "09d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_09d, 64, 64, true);
+	else if (icon == "09n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_09n, 64, 64, true);
+	else if (icon == "10d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_10d, 64, 64, true);
+	else if (icon == "10n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_03n, 64, 64, true);
+	else if (icon == "11d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_11d, 64, 64, true);
+	else if (icon == "11n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_11n, 64, 64, true);
+	else if (icon == "13d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_13d, 64, 64, true);
+	else if (icon == "13n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_13n, 64, 64, true);
+	else if (icon == "50d") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_50d, 64, 64, true);
+	else if (icon == "50n") drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_50n, 64, 64, true);
+	else drawIcon(myWeather, iconX, iconY, (uint16_t*)image_data_unknown, 64, 64, true);
 
 	myWeather.drawCentreString(String(tMin) + "/" + String(tMax), x + dx / 2, y + 76, 1);
 	myWeather.drawCentreString(String(pop) + "%", x + dx / 2, y + 99, 1);

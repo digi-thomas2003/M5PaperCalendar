@@ -7,6 +7,7 @@
 /* Start WiFi and Connect to Network */
 boolean connectWiFi() {
 
+	WiFi.disconnect();
 	WiFi.mode(WIFI_STA);
 	WiFi.config(ip, gateway, subnet, dns);
 	WiFi.begin(ssid, password);

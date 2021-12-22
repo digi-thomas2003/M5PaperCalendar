@@ -194,7 +194,7 @@ bool readCalendar() {
 	Serial.println("Getting calendar");
 	Serial.println(calendarRequest);
 
-	if (!checkWiFi) connectWiFi();
+	if (!checkWiFi()) connectWiFi();
 
 	http.end();
 	http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
