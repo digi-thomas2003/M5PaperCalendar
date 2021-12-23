@@ -2,8 +2,8 @@
 
   Digital Calendar on M5Paper
   The M5PAPER is equipped with an e-ink screen with a resolution of 540*960 @ 4.7" and supports 16 levels of grayscale display.
-							   Btn P/R/L
-								   |
+                               Btn P/R/
+                                   |
 	 +-----------------------------°-------------------+
 	 | 0/0   ePaper  960 x 540                         |
 	 |                                                 |
@@ -89,7 +89,7 @@ IPAddress subnet(255, 255, 255, 0);
 
 #define MYBLACK M5EPD_Canvas::G15
 #define MYWHITE M5EPD_Canvas::G0	
-#define MYGREY M5EPD_Canvas::G5
+#define MYGREY  M5EPD_Canvas::G5
 
 // time and date vars
 struct tm tm;
