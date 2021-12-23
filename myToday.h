@@ -1,12 +1,9 @@
 // myToday.h
 
 // functions for the pure clock page
-// tbd: shows time, date, the next event, the current weather
+// shows time, date, the next event, the current weather
 
 #pragma once
-//#include "Icons.h"
-//#include "myWeather.h"
-
 
 void printTime() {
 	char timeString[16];
@@ -61,8 +58,6 @@ void printDate() {
 	myToday.drawString(buf1, 5, 75);
 	myToday.pushCanvas(5, 390, UPDATE_MODE_GC16);
 	myToday.deleteCanvas();
-
-
 }
 
 void printFrame() {
@@ -99,7 +94,6 @@ void printFrame() {
 
 	myToday.pushCanvas(0, 0, UPDATE_MODE_GC16);
 	myToday.deleteCanvas();
-
 }
 
 void printWeather() {
@@ -109,7 +103,7 @@ void printWeather() {
 
 	Serial.println("weather OK? " + String(rTW));
 	if (rTW) getLocalTime(&weatherTime);
-	
+
 	myToday.createCanvas(330, 135);
 
 	String icon = weather.hourlyIcon[0];
@@ -150,4 +144,70 @@ void printWeather() {
 	myToday.pushCanvas(5, 210, UPDATE_MODE_GC16);
 	myToday.deleteCanvas();
 
+}
+
+void printNextEvent() {
+	byte p = 0;
+	int checkDay;
+	int checkMonth;
+	int checkYear;
+	int checkMin;
+	int checkHour;
+
+
+	rTC = readCalendar();
+
+	Serial.println("Calendar OK? " + String(rTC));
+
+	M5.RTC.getTime(&currentTime);
+	M5.RTC.getDate(&currentDate);
+
+	tmElements_t currentNow = { 0, currentTime.min, currentTime.hour, 0, currentDate.day, currentDate.mon, currentDate.year - 1970 };
+	time_t currentNowTime = makeTime(currentNow);
+
+	//Serial.println("CurrentNow: " + String(currentNowTime));
+
+	for (byte r = 0; r < 11; r++) {
+		checkDay = calEnt[r].calStartDate.substring(0, 2).toInt();
+		checkMonth = calEnt[r].calStartDate.substring(3, 5).toInt();
+		checkYear = calEnt[r].calStartDate.substring(6, 10).toInt();
+		checkHour = calEnt[r].calStartTime.substring(0, 2).toInt();
+		checkMin = calEnt[r].calStartTime.substring(3, 5).toInt();
+
+		//Serial.println(String(checkMin) + " " + String(checkHour) + " " + String(checkDay) + " " + String(checkMonth) + " " + String(checkYear));
+
+		tmElements_t calEvent = { 0, checkMin, checkHour, 0, checkDay, checkMonth, checkYear - 1970 };
+		time_t calEventTime = makeTime(calEvent);
+
+		//Serial.println("calEventTime: " + String(calEventTime));
+
+		if (currentNowTime <= calEventTime && calEnt[r].calAllDay == "false") {
+			p = r;
+			break;
+		}
+		if (calEnt[r].calStartDate == "") break;
+	}
+
+	//Serial.println("p = " + String(p));
+
+	myToday.createCanvas(600, 135);
+
+	myToday.setTextSize(36);
+	myToday.setTextDatum(TL_DATUM);
+	if (!rTC) {
+		myToday.drawString("Fehler beim Holen der Daten", 5, 20);
+	}
+	else {
+		myToday.drawString(calEnt[p].calTitle, 5, 10);
+		myToday.setTextSize(24);
+		int x = 5, y = 50, s = 25;
+		myToday.fillCircle(x + s / 2, y + s / 3, s / 3, MYBLACK);
+		myToday.fillTriangle(x + s / 2, y + s, (x + s / 2) - s / 3.75, y + s / 2, (x + s / 2) + s / 3.5, y + s / 2, MYBLACK);
+		myToday.fillCircle(x + s / 2, y + s / 3, s / 6, MYWHITE);
+		myToday.drawString(calEnt[p].calLocation, 35, 50);
+		myToday.drawString(calEnt[p].calStartDate + " / " + calEnt[p].calStartTime, 5, 80);
+	}
+
+	myToday.pushCanvas(355, 210, UPDATE_MODE_GC16);
+	myToday.deleteCanvas();
 }

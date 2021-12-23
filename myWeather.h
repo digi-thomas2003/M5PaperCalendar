@@ -3,9 +3,6 @@
 // all the functions for weather
 
 #pragma once
-//#include "Icons.h"
-//#include "myUtils.h"
-
 
 /* Convert UTC time to local time */
 time_t LocalTime(time_t time) {

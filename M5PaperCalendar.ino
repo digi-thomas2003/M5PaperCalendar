@@ -2,7 +2,7 @@
 
   Digital Calendar on M5Paper
   The M5PAPER is equipped with an e-ink screen with a resolution of 540*960 @ 4.7" and supports 16 levels of grayscale display.
-                               Btn P/R/
+                               Btn L/P/R
                                    |
 	 +-----------------------------°-------------------+
 	 | 0/0   ePaper  960 x 540                         |
@@ -46,6 +46,7 @@
   V0.4  05.12.2021: Small bug fixes, show "+" if read data was ok
   V0.5  18.12.2021: Tuned the mini calendar, renamed "pure clock" to "today", some bug fixes
   V0.6  22.12.2021: Worked on the today page
+  V0.7  23.12.2021: Added the next event to today page
 
 
   Important note:
@@ -58,7 +59,7 @@
 
  *********************************************************************/
 
-#define FIRMWARE "0.6 - 2021-12-22"
+#define FIRMWARE "0.7 - 2021-12-23"
 
  /**************************************************************************************
  **     Libraries
@@ -116,7 +117,9 @@ int     sht30Humidity;    // SHT30 humidity
 const int calEntryCount = 10;
 const int calEntryMuellCount = 10;
 bool rC = false;
+bool rTC = false;
 String calendarOK = "x";
+String calendarTOK = "x";
 
 struct calendarEntries {
 	String calStartDate;
@@ -286,6 +289,7 @@ void loop() {
 		printTime();
 		printDate();
 		printWeather();
+		printNextEvent();
 		Serial.println(page);
 	}
 	if (M5.BtnP.wasPressed()) {
@@ -327,7 +331,10 @@ void loop() {
 
 	if (currentTime.hour != oldHour) {
 		oldHour = currentTime.hour;
-		if (page == 1) printWeather();
+		if (page == 1) {
+			printWeather();
+			printNextEvent();
+		}
 		if (page == 2) eventList();
 		if (page == 3) {
 			getSHT30Values();
