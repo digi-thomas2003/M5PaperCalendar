@@ -5,20 +5,18 @@
 
 #pragma once
 //#include "Icons.h"
-#include "myWeather.h"
+//#include "myWeather.h"
 
 
 void printTime() {
 	char timeString[16];
-	char buf1[64];
-	char last[64];
 
 	sprintf(timeString, " %02d:%02d ", currentTime.hour, currentTime.min);
 
-	myToday.createCanvas(380, 100);
+	myToday.createCanvas(330, 100);
 	myToday.setTextSize(92);
 	myToday.setTextDatum(TC_DATUM);
-	myToday.drawString(timeString, 195, 5);
+	myToday.drawString(timeString, 165, 5);
 	myToday.pushCanvas(5, 60, UPDATE_MODE_GC16);
 	myToday.deleteCanvas();
 
@@ -40,13 +38,13 @@ void printDate() {
 	strftime(buf1, sizeof(buf1), "KW: %V / Tag im Jahr: %j", &tm);
 	strftime(buf2, sizeof(buf2), "Zeitzone: %Z", &tm);
 
-	myToday.createCanvas(550, 115);
+	myToday.createCanvas(600, 115);
 	myToday.setTextSize(36);
 	myToday.setTextDatum(TL_DATUM);
 	myToday.drawString(dateString, 5, 0);
 	myToday.drawString(buf1, 5, 38);
 	myToday.drawString(buf2, 5, 76);
-	myToday.pushCanvas(405, 60, UPDATE_MODE_GC16);
+	myToday.pushCanvas(355, 60, UPDATE_MODE_GC16);
 	myToday.deleteCanvas();
 
 	myToday.createCanvas(600, 120);
@@ -83,13 +81,13 @@ void printFrame() {
 	myToday.drawFastHLine(0, 350, 960, 2, MYBLACK);
 	myToday.drawFastVLine(0, 0, 540, 3, MYBLACK);
 	myToday.drawFastVLine(960, 0, 540, 3, MYBLACK);
-	myToday.drawFastVLine(400, 30, 320, 2, MYBLACK);
+	myToday.drawFastVLine(350, 30, 320, 2, MYBLACK);
 	myToday.setTextSize(24);
 	myToday.setTextDatum(TL_DATUM);
 	myToday.drawString("Zeit: ", 5, 35);
-	myToday.drawString("Datum: ", 405, 35);
+	myToday.drawString("Datum: ", 355, 35);
 	myToday.drawString("Aktuelles Wetter: ", 5, 185);
-	myToday.drawString("N\u00e4chster Termin: ", 405, 185);
+	myToday.drawString("N\u00e4chster Termin: ", 355, 185);
 	myToday.drawString("System-Infos: ", 5, 355);
 
 	myToday.fillRect(0, 510, 960, 30, MYBLACK);
@@ -105,7 +103,14 @@ void printFrame() {
 }
 
 void printWeather() {
-	myToday.createCanvas(380, 135);
+	char buf[64];
+
+	rTW = readWeather();
+
+	Serial.println("weather OK? " + String(rTW));
+	if (rTW) getLocalTime(&weatherTime);
+	
+	myToday.createCanvas(330, 135);
 
 	String icon = weather.hourlyIcon[0];
 	int iconX = 10;
@@ -133,13 +138,16 @@ void printWeather() {
 
 	myToday.setTextDatum(TL_DATUM);
 	myToday.setTextSize(24);
-	myToday.drawString(weather.hourlyMain[0], 5, 90);
+	myToday.drawString(weather.hourlyMain[0], 5, 80);
 
 	myToday.setTextSize(36);
-	myToday.drawString(getFloatString(weather.hourlyMaxTemp[0], "  \u00b0C"), 180, 30);
+	myToday.drawString(getFloatString(weather.hourlyMaxTemp[0], "  \u00b0C"), 150, 30);
+
+	myToday.setTextSize(14);
+	strftime(buf, sizeof(buf), "Stand: %d.%m.%Y %H:%M:%S", &weatherTime);
+	myToday.drawString(buf, 5, 110);
 
 	myToday.pushCanvas(5, 210, UPDATE_MODE_GC16);
 	myToday.deleteCanvas();
-
 
 }

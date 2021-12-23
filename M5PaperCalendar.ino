@@ -94,6 +94,7 @@ IPAddress subnet(255, 255, 255, 0);
 // time and date vars
 struct tm tm;
 struct tm start;
+struct tm weatherTime;
 rtc_time_t currentTime;
 rtc_date_t currentDate;
 byte oldMinute = 65;
@@ -172,6 +173,7 @@ struct Weather {
 };
 Weather weather;
 bool rW = false;
+bool rTW = false;
 String weatherOK = "x";
 
 // the page: 1 = Today, 2 = Calendar, 3 = weather
@@ -197,8 +199,8 @@ WiFiClient client;
 // include all the helpers
 #include "Icons.h"
 #include "myWiFi.h"
-#include "myCalendar.h"
 #include "myUtils.h"
+#include "myCalendar.h"
 #include "myWeather.h"
 #include "myToday.h"
 
@@ -325,10 +327,7 @@ void loop() {
 
 	if (currentTime.hour != oldHour) {
 		oldHour = currentTime.hour;
-		if (page == 1) {
-			readWeather();
-			printWeather();
-		}
+		if (page == 1) printWeather();
 		if (page == 2) eventList();
 		if (page == 3) {
 			getSHT30Values();
