@@ -20,10 +20,10 @@ void drawBattery(M5EPD_Canvas& canvas1, int x, int y) {
 
 	canvas1.setTextDatum(TR_DATUM);
 	canvas1.drawString(String(batteryCapacity) + "%", x - 5, y);
-	canvas1.drawRect(x, y, 40, 16, M5EPD_Canvas::G15);
-	canvas1.drawRect(x + 40, y + 3, 4, 10, M5EPD_Canvas::G15);
+	canvas1.drawRect(x, y, 40, 16, MYBLACK);
+	canvas1.drawRect(x + 40, y + 3, 4, 10, MYBLACK);
 	for (int i = x; i < x + 40; i++) {
-		canvas1.drawLine(i, y, i, y + 15, M5EPD_Canvas::G15);
+		canvas1.drawLine(i, y, i, y + 15, MYBLACK);
 		if ((i - x) * 100.0 / 40.0 > batteryCapacity) {
 			break;
 		}
@@ -83,7 +83,7 @@ void textEllipsis(M5EPD_Canvas& canvas1, int x, int y, int width, const char* te
 /* Convert the float value to string with unit */
 String getFloatString(float value, const char* unit) {
 	char buff[32];
-	sprintf(buff, "%6.2f%s", value, unit);
+	sprintf(buff, "%.1f%s", value, unit);
 	return (String)buff;
 }
 

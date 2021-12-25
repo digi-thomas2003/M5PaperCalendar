@@ -17,12 +17,12 @@ void printTime() {
 	myToday.pushCanvas(5, 60, UPDATE_MODE_GC16);
 	myToday.deleteCanvas();
 
-	myToday.createCanvas(310, 80);
+	myToday.createCanvas(200, 80);
 	myToday.fillCanvas(MYWHITE);
 	myToday.setTextSize(18);
-	drawBattery(myToday, 250, 10);
-	drawRSSI(myToday, 250, 45);
-	myToday.pushCanvas(650, 410, UPDATE_MODE_GC16);
+	drawBattery(myToday, 130, 10);
+	drawRSSI(myToday, 130, 45);
+	myToday.pushCanvas(750, 410, UPDATE_MODE_GC16);
 	myToday.deleteCanvas();
 }
 
@@ -35,7 +35,7 @@ void printDate() {
 	strftime(buf1, sizeof(buf1), "KW: %V / Tag im Jahr: %j", &tm);
 	strftime(buf2, sizeof(buf2), "Zeitzone: %Z", &tm);
 
-	myToday.createCanvas(600, 115);
+	myToday.createCanvas(595, 115);
 	myToday.setTextSize(36);
 	myToday.setTextDatum(TL_DATUM);
 	myToday.drawString(dateString, 5, 0);
@@ -75,7 +75,7 @@ void printFrame() {
 	myToday.drawFastHLine(0, 180, 960, 2, MYBLACK);
 	myToday.drawFastHLine(0, 350, 960, 2, MYBLACK);
 	myToday.drawFastVLine(0, 0, 540, 3, MYBLACK);
-	myToday.drawFastVLine(960, 0, 540, 3, MYBLACK);
+	myToday.drawFastVLine(956, 0, 540, 3, MYBLACK);
 	myToday.drawFastVLine(350, 30, 320, 2, MYBLACK);
 	myToday.setTextSize(24);
 	myToday.setTextDatum(TL_DATUM);
@@ -135,9 +135,12 @@ void printWeather() {
 	myToday.drawString(weather.hourlyMain[0], 5, 80);
 
 	myToday.setTextSize(36);
-	myToday.drawString(getFloatString(weather.hourlyMaxTemp[0], "  \u00b0C"), 150, 30);
+	myToday.setTextDatum(TR_DATUM);
+	myToday.drawString("A: " + getFloatString(weather.hourlyMaxTemp[0], " \u00b0C"), 330, 10);
+	myToday.drawString("I: " + String(sht30Temperatur) + " \u00b0C", 330, 50);
 
 	myToday.setTextSize(14);
+	myToday.setTextDatum(TL_DATUM);
 	strftime(buf, sizeof(buf), "Stand: %d.%m.%Y %H:%M:%S", &weatherTime);
 	myToday.drawString(buf, 5, 110);
 
@@ -147,13 +150,12 @@ void printWeather() {
 }
 
 void printNextEvent() {
-	byte p = 0;
+	byte p = 20;
 	int checkDay;
 	int checkMonth;
 	int checkYear;
 	int checkMin;
 	int checkHour;
-
 
 	rTC = readCalendar();
 
@@ -190,20 +192,20 @@ void printNextEvent() {
 
 	//Serial.println("p = " + String(p));
 
-	myToday.createCanvas(600, 135);
+	myToday.createCanvas(595, 135);
 
 	myToday.setTextSize(36);
 	myToday.setTextDatum(TL_DATUM);
 	if (!rTC) {
 		myToday.drawString("Fehler beim Holen der Daten", 5, 20);
 	}
+	else if (p == 20) {
+		myToday.drawString("Kein Termin in der n\u00e4chsten Zeit", 5, 20);
+	}
 	else {
 		myToday.drawString(calEnt[p].calTitle, 5, 10);
 		myToday.setTextSize(24);
-		int x = 5, y = 50, s = 25;
-		myToday.fillCircle(x + s / 2, y + s / 3, s / 3, MYBLACK);
-		myToday.fillTriangle(x + s / 2, y + s, (x + s / 2) - s / 3.75, y + s / 2, (x + s / 2) + s / 3.5, y + s / 2, MYBLACK);
-		myToday.fillCircle(x + s / 2, y + s / 3, s / 6, MYWHITE);
+		iconLocation(myToday, 5, 50, 25);
 		myToday.drawString(calEnt[p].calLocation, 35, 50);
 		myToday.drawString(calEnt[p].calStartDate + " / " + calEnt[p].calStartTime, 5, 80);
 	}

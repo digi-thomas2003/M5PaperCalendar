@@ -332,6 +332,7 @@ void loop() {
 	if (currentTime.hour != oldHour) {
 		oldHour = currentTime.hour;
 		if (page == 1) {
+			getSHT30Values();
 			printWeather();
 			printNextEvent();
 		}
