@@ -54,11 +54,11 @@ void drawRSSI(M5EPD_Canvas& canvas1, int x, int y) {
 
 	canvas1.setTextDatum(TR_DATUM);
 	canvas1.drawString(String(quality) + "%", x - 5, y);
-	if (quality >= 80) drawCircle(canvas1, x + 12, y + 15, 16, M5EPD_Canvas::G15, 225, 315);
-	if (quality >= 40) drawCircle(canvas1, x + 12, y + 15, 12, M5EPD_Canvas::G15, 225, 315);
-	if (quality >= 20) drawCircle(canvas1, x + 12, y + 15, 8, M5EPD_Canvas::G15, 225, 315);
-	if (quality >= 10) drawCircle(canvas1, x + 12, y + 15, 4, M5EPD_Canvas::G15, 225, 315);
-	drawCircle(canvas1, x + 12, y + 10, 2, M5EPD_Canvas::G15, 225, 315);
+	if (quality >= 80) drawCircle(canvas1, x + 12, y + 15, 16, MYBLACK, 225, 315);
+	if (quality >= 40) drawCircle(canvas1, x + 12, y + 15, 12, MYBLACK, 225, 315);
+	if (quality >= 20) drawCircle(canvas1, x + 12, y + 15, 8, MYBLACK, 225, 315);
+	if (quality >= 10) drawCircle(canvas1, x + 12, y + 15, 4, MYBLACK, 225, 315);
+	drawCircle(canvas1, x + 12, y + 10, 2, MYBLACK, 225, 315);
 }
 
 
@@ -90,8 +90,7 @@ String getFloatString(float value, const char* unit) {
 /* Convert the minute of the time_t */
 String getHourMinString(time_t rawtime) {
 	char buff[32];
-	sprintf(buff, "%02d:%02d",
-		hour(rawtime), minute(rawtime));
+	sprintf(buff, "%02d:%02d", hour(rawtime), minute(rawtime));
 	return (String)buff;
 }
 
@@ -100,8 +99,7 @@ String getRTCDateString() {
 	char       buff[32];
 	rtc_date_t date_struct;
 	M5.RTC.getDate(&date_struct);
-	sprintf(buff, "%02d.%02d.%04d",
-		date_struct.day, date_struct.mon, date_struct.year);
+	sprintf(buff, "%02d.%02d.%04d",	date_struct.day, date_struct.mon, date_struct.year);
 	return (String)buff;
 }
 
@@ -110,8 +108,7 @@ String getRTCTimeString() {
 	char       buff[32];
 	rtc_time_t time_struct;
 	M5.RTC.getTime(&time_struct);
-	sprintf(buff, "%02d:%02d",
-		time_struct.hour, time_struct.min);
+	sprintf(buff, "%02d:%02d", time_struct.hour, time_struct.min);
 	return (String)buff;
 }
 

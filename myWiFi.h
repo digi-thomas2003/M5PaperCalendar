@@ -52,24 +52,8 @@ bool setupTime() {
 		return false;
 	}
 	else {
-		if (getLocalTime(&start)) {
-			rtc_time_t time_struct;
-			time_struct.hour = start.tm_hour;
-			time_struct.min = start.tm_min;
-			time_struct.sec = start.tm_sec;
-			M5.RTC.setTime(&time_struct);                         // feed the RTC with the time
-			rtc_date_t date_struct;
-			date_struct.week = start.tm_wday;
-			date_struct.mon = start.tm_mon + 1;
-			date_struct.day = start.tm_mday;
-			date_struct.year = start.tm_year + 1900;
-			M5.RTC.setDate(&date_struct);                         // feed the RTC with the date
-			Serial.print("Time synced\n");
-			Serial.println(&start, "Programmstart: %A, %d.%B.%Y %H:%M:%S");
-			return true;
-		}
-		Serial.print("Time Sync failed");
-		return false;
+		Serial.print("Time synced\n");
+		return true;
 	}
 }
 

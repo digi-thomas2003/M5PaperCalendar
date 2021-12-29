@@ -8,7 +8,7 @@
 void printTime() {
 	char timeString[16];
 
-	sprintf(timeString, " %02d:%02d ", currentTime.hour, currentTime.min);
+	sprintf(timeString, " %02d:%02d ", tm.tm_hour, tm.tm_min);
 
 	myToday.createCanvas(330, 100);
 	myToday.setTextSize(92);
@@ -31,7 +31,7 @@ void printDate() {
 	char buf1[64];
 	char buf2[30];
 
-	sprintf(dateString, "%s, %02d. %s %04d", dayNames[currentDate.week], currentDate.day, monthNames[currentDate.mon], currentDate.year);
+	sprintf(dateString, "%s, %02d. %s %04d", dayNames[tm.tm_wday], tm.tm_mday, monthNames[tm.tm_mon + 1], tm.tm_year + 1900);
 	strftime(buf1, sizeof(buf1), "KW: %V / Tag im Jahr: %j", &tm);
 	strftime(buf2, sizeof(buf2), "Zeitzone: %Z", &tm);
 
@@ -89,7 +89,7 @@ void printFrame() {
 	myToday.setTextSize(24);
 	myToday.setTextDatum(TC_DATUM);
 	myToday.setTextColor(MYWHITE, MYBLACK);
-	myToday.drawString("\u00a9 TomSoft " + String(currentDate.year), 480, 513);
+	myToday.drawString("\u00a9 TomSoft " + String(tm.tm_year + 1900), 480, 513);
 	myToday.setTextColor(MYBLACK, MYWHITE);
 
 	myToday.pushCanvas(0, 0, UPDATE_MODE_GC16);
@@ -130,14 +130,14 @@ void printWeather() {
 	else if (icon == "50n") drawIcon(myToday, iconX, iconY, (uint16_t*)image_data_50n, 64, 64, true);
 	else drawIcon(myToday, iconX, iconY, (uint16_t*)image_data_unknown, 64, 64, true);
 
+	myToday.setTextSize(36);
+	myToday.setTextDatum(TR_DATUM);
+	myToday.drawString("A: " + getFloatString(weather.hourlyMaxTemp[0], " \u00b0C"), 330, 5);
+	myToday.drawString("I: " + String(sht30Temperatur) + " \u00b0C", 330, 45);
+
 	myToday.setTextDatum(TL_DATUM);
 	myToday.setTextSize(24);
 	myToday.drawString(weather.hourlyMain[0], 5, 80);
-
-	myToday.setTextSize(36);
-	myToday.setTextDatum(TR_DATUM);
-	myToday.drawString("A: " + getFloatString(weather.hourlyMaxTemp[0], " \u00b0C"), 330, 10);
-	myToday.drawString("I: " + String(sht30Temperatur) + " \u00b0C", 330, 50);
 
 	myToday.setTextSize(14);
 	myToday.setTextDatum(TL_DATUM);
@@ -161,10 +161,7 @@ void printNextEvent() {
 
 	Serial.println("Calendar OK? " + String(rTC));
 
-	M5.RTC.getTime(&currentTime);
-	M5.RTC.getDate(&currentDate);
-
-	tmElements_t currentNow = { 0, currentTime.min, currentTime.hour, 0, currentDate.day, currentDate.mon, currentDate.year - 1970 };
+	tmElements_t currentNow = { 0, tm.tm_min, tm.tm_hour, 0, tm.tm_mday, tm.tm_mon, tm.tm_year + 1900 };
 	time_t currentNowTime = makeTime(currentNow);
 
 	//Serial.println("CurrentNow: " + String(currentNowTime));
@@ -178,7 +175,7 @@ void printNextEvent() {
 
 		//Serial.println(String(checkMin) + " " + String(checkHour) + " " + String(checkDay) + " " + String(checkMonth) + " " + String(checkYear));
 
-		tmElements_t calEvent = { 0, checkMin, checkHour, 0, checkDay, checkMonth, checkYear - 1970 };
+		tmElements_t calEvent = { 0, checkMin, checkHour, 0, checkDay, checkMonth, checkYear };
 		time_t calEventTime = makeTime(calEvent);
 
 		//Serial.println("calEventTime: " + String(calEventTime));
@@ -205,9 +202,11 @@ void printNextEvent() {
 	else {
 		myToday.drawString(calEnt[p].calTitle, 5, 10);
 		myToday.setTextSize(24);
-		iconLocation(myToday, 5, 50, 25);
-		myToday.drawString(calEnt[p].calLocation, 35, 50);
-		myToday.drawString(calEnt[p].calStartDate + " / " + calEnt[p].calStartTime, 5, 80);
+		if (calEnt[p].calLocation != "") {
+			iconLocation(myToday, 5, 50, 25);
+			myToday.drawString(calEnt[p].calLocation, 35, 50);
+		}
+		myToday.drawString(calEnt[p].calStartDate + " / " + calEnt[p].calStartTime + " - " + calEnt[p].calEndTime, 5, 80);
 	}
 
 	myToday.pushCanvas(355, 210, UPDATE_MODE_GC16);

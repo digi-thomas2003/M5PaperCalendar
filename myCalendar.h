@@ -61,8 +61,8 @@ void miniCalendar() {
 
 	yOffset += 24;
 
-	int virtCurCount = getDaysInMonth(currentDate.mon, currentDate.year);
-	int virt1wd = getDayOfWeek(currentDate.year, currentDate.mon, 1);
+	int virtCurCount = getDaysInMonth(tm.tm_mon + 1, tm.tm_year + 1900);
+	int virt1wd = getDayOfWeek(tm.tm_year + 1900, tm.tm_mon + 1, 1);
 
 	sideBar.setTextSize(18);
 
@@ -71,10 +71,10 @@ void miniCalendar() {
 		virtMon[i] = 0;
 	}
 
-	if (currentDate.mon == 1) virtOldMM = 12;
-	else virtOldMM = currentDate.mon - 1;
+	if (tm.tm_mon + 1 == 1) virtOldMM = 12;        // it's because January = 0 and December = 11
+	else virtOldMM = tm.tm_mon +1 - 1;
 
-	int virtOldCount = getDaysInMonth(virtOldMM, currentDate.year);
+	int virtOldCount = getDaysInMonth(virtOldMM, tm.tm_year + 1900);
 
 	// fill in the month before the current one
 	if (virt1wd == 1) {                             // first day of current month is monday
@@ -116,7 +116,7 @@ void miniCalendar() {
 
 			sideBar.setTextColor(fg, MYBLACK);
 
-			if ((pbID == 1) && (w == currentDate.day)) {
+			if ((pbID == 1) && (w == tm.tm_mday)) {
 				fg = MYBLACK;
 				sideBar.fillCircle((15 + (col_width * (col - 1)) + (col_width / 2)), (yOffset + (30 * row) + 8), 16, MYWHITE);
 				sideBar.setTextColor(fg, MYWHITE);
@@ -131,14 +131,13 @@ void miniCalendar() {
 // build and show the calendar sidebar
 void showSideBar() {
 
-	// date
-	M5.RTC.getDate(&currentDate);
+	getLocalTime(&tm);
 
 	// Day, Weekday, Month and Year
 	char day[3];
-	sprintf(day, "%02d", currentDate.day);
-	const char* weekday = dayNames[currentDate.week];
-	const char* month = monthNames[currentDate.mon];
+	sprintf(day, "%02d", tm.tm_mday);
+	const char* weekday = dayNames[tm.tm_wday];
+	const char* month = monthNames[tm.tm_mon + 1];
 
 	// black background white foreground
 	sideBar.fillCanvas(MYBLACK);
@@ -158,7 +157,7 @@ void showSideBar() {
 	sideBar.setTextSize(24);
 	sideBar.setTextDatum(TC_DATUM);
 	char monthYear[20];
-	sprintf(monthYear, "%s %04d", month, currentDate.year);
+	sprintf(monthYear, "%s %04d", month, tm.tm_year + 1900);
 	sideBar.drawString(monthYear, 150, 170);
 
 	miniCalendar();
@@ -170,10 +169,10 @@ void showSideBar() {
 /* build and show a little clock*/
 void showClock() {
 
-	M5.RTC.getTime(&currentTime);
+	getLocalTime(&tm);
 
 	char timeString[16];
-	sprintf(timeString, " %02d:%02d ", currentTime.hour, currentTime.min);
+	sprintf(timeString, " %02d:%02d ", tm.tm_hour, tm.tm_min);
 
 	myClock.fillCanvas(MYWHITE);
 	myClock.setTextColor(MYBLACK, MYWHITE);
@@ -334,7 +333,6 @@ int eventDate(int y, const char* day, const char* weekday) {
 }
 
 
-
 void eventList() {
 
 	rC = readCalendar();
@@ -348,8 +346,7 @@ void eventList() {
 		return;
 	}
 
-	M5.RTC.getTime(&currentTime);
-	M5.RTC.getDate(&currentDate);
+	getLocalTime(&tm);
 
 	events.fillCanvas(MYWHITE);
 	events.setTextSize(42);
@@ -401,7 +398,3 @@ void eventList() {
 
 	events.pushCanvas(300, 0, UPDATE_MODE_GC16);
 }
-
-
-
-

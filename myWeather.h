@@ -505,7 +505,7 @@ void showWeather() {
 	drawWeatherInfo(15, 35, 232, 251);
 	drawSunInfo(232, 35, 232, 251);
 	drawWindInfo(465, 35, 232, 251);
-	drawM5PaperInfo(697, 35, 245, 251); // 697, 35, 245, 251
+	drawM5PaperInfo(697, 35, 249, 251); // 697, 35, 245, 251
 	myWeather.drawRect(15, 35, maxX - 30, 251, MYBLACK);
 	myWeather.drawLine(232, 35, 232, 286, MYBLACK);
 	myWeather.drawLine(465, 35, 465, 286, MYBLACK);
@@ -532,14 +532,14 @@ void showWeather() {
 void showM5PaperInfo() {
 	Serial.println("ShowM5PaperInfo");
 
-	myWeather.createCanvas(245, 253);
+	myWeather.createCanvas(250, 251);
 
 	myWeather.setTextSize(24);
 	myWeather.setTextColor(MYBLACK, MYWHITE);
 	myWeather.setTextDatum(TL_DATUM);
 
-	myWeather.drawRect(0, 0, 245, 251, MYBLACK);
-	drawM5PaperInfo(0, 0, 245, 251);
+	myWeather.drawRect(0, 0, 250, 251, MYBLACK);
+	drawM5PaperInfo(0, 0, 249, 251);
 
 	myWeather.pushCanvas(695, 35, UPDATE_MODE_GC16);
 	myWeather.deleteCanvas();

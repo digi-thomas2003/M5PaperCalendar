@@ -47,6 +47,7 @@
   V0.5  18.12.2021: Tuned the mini calendar, renamed "pure clock" to "today", some bug fixes
   V0.6  22.12.2021: Worked on the today page
   V0.7  23.12.2021: Added the next event to today page
+  V0.8  29.12.2021: Changed time - no more using the rtc because time is synced with ntp time server every new day
 
 
   Important note:
@@ -59,7 +60,7 @@
 
  *********************************************************************/
 
-#define FIRMWARE "0.7 - 2021-12-23"
+#define FIRMWARE "0.8 - 2021-12-29"
 
  /**************************************************************************************
  **     Libraries
@@ -96,8 +97,8 @@ IPAddress subnet(255, 255, 255, 0);
 struct tm tm;
 struct tm start;
 struct tm weatherTime;
-rtc_time_t currentTime;
-rtc_date_t currentDate;
+//rtc_time_t currentTime;
+//rtc_date_t currentDate;
 byte oldMinute = 65;
 byte oldDay = 0;
 byte oldHour = 25;
@@ -119,7 +120,6 @@ const int calEntryMuellCount = 10;
 bool rC = false;
 bool rTC = false;
 String calendarOK = "x";
-String calendarTOK = "x";
 
 struct calendarEntries {
 	String calStartDate;
@@ -190,7 +190,7 @@ M5EPD_Canvas sideBar(&M5.EPD);
 M5EPD_Canvas myClock(&M5.EPD);
 M5EPD_Canvas events(&M5.EPD);
 M5EPD_Canvas nextEvent(&M5.EPD);
-//pure clock page
+//today page
 M5EPD_Canvas myToday(&M5.EPD);
 // weather page
 M5EPD_Canvas myWeather(&M5.EPD);
@@ -206,7 +206,6 @@ WiFiClient client;
 #include "myCalendar.h"
 #include "myWeather.h"
 #include "myToday.h"
-
 
 
 /////////////////////////////// Setup /////////////////////////////////////////////////////////////////////////
@@ -233,8 +232,8 @@ void setup() {
 	}
 
 	setupTime();
-	M5.RTC.getTime(&currentTime);
-	M5.RTC.getDate(&currentDate);
+	getLocalTime(&start);
+	Serial.println(&start, "Programmstart: %A, %d.%B.%Y %H:%M:%S");
 
 	// calendar page
 	sideBar.createCanvas(300, 540);
@@ -270,9 +269,6 @@ void setup() {
 
 /////////////////////////// Loop ////////////////////////////////////////////////////////////////////////
 void loop() {
-
-	M5.RTC.getTime(&currentTime);
-	M5.RTC.getDate(&currentDate);
 
 	getLocalTime(&tm);
 
@@ -319,8 +315,8 @@ void loop() {
 		Serial.println(page);
 	}
 
-	if (currentTime.min != oldMinute) {
-		oldMinute = currentTime.min;
+	if (tm.tm_min != oldMinute) {
+		oldMinute = tm.tm_min;
 		if (page == 1) printTime();
 		if (page == 2) showClock();
 		if (page == 3) {
@@ -329,8 +325,8 @@ void loop() {
 		}
 	}
 
-	if (currentTime.hour != oldHour) {
-		oldHour = currentTime.hour;
+	if (tm.tm_hour != oldHour) {
+		oldHour = tm.tm_hour;
 		if (page == 1) {
 			getSHT30Values();
 			printWeather();
@@ -343,8 +339,9 @@ void loop() {
 		}
 	}
 
-	if (currentDate.day != oldDay) {
-		oldDay = currentDate.day;
+	if (tm.tm_mday != oldDay) {
+		oldDay = tm.tm_mday;
+		getTime();                   // sync the time with the timeserver every new day
 		if (page == 1) printDate();
 		if (page == 2) showSideBar();
 	}
