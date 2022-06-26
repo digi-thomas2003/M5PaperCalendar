@@ -36,7 +36,7 @@
 
 
   Inspired by this:
-  Calendar:  https://github.com/SeBassTian23/ESP32-CalendarDisplay
+  Calendar:  https://github.com/SeBassTian23/ESP32-CalendarDisplay / https://github.com/kristiantm/eink-family-calendar-esp32
   PureClock: https://github.com/azw413/M5-Clock
   Weather:   https://github.com/mzyy94/M5PaperWeather/tree/jp-model
 
@@ -48,19 +48,20 @@
   V0.6  22.12.2021: Worked on the today page
   V0.7  23.12.2021: Added the next event to today page
   V0.8  29.12.2021: Changed time - no more using the rtc because time is synced with ntp time server every new day
+  V0.9  03.04.2022: Some minor improvements on the weather page
 
 
   Important note:
   ---------------
   Due to changes in arduino-esp32 version 2.0.1.
-  change line 67 in M5EPD.cpp like this:
+  change line 67 in M5EPD.cpp and
 		  Wire.begin(21, 22, (uint32_t)400000);
 
 
 
  *********************************************************************/
 
-#define FIRMWARE "0.8 - 2021-12-29"
+#define FIRMWARE "0.9 - 2022-04-03"
 
  /**************************************************************************************
  **     Libraries
@@ -111,8 +112,8 @@ const char* const PROGMEM monthNames[] = { "Error",  "Januar", "Februar", "M\u00
 const char* const PROGMEM monthShortNamesMMM[] = { "Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez" };
 
 // internal temperature and humidity
-int     sht30Temperatur;  // SHT30 temperature
-int     sht30Humidity;    // SHT30 humidity
+int sht30Temperatur;  // SHT30 temperature
+int sht30Humidity;    // SHT30 humidity
 
 // the calendar vars
 const int calEntryCount = 10;
@@ -197,7 +198,7 @@ M5EPD_Canvas myWeather(&M5.EPD);
 
 // the clients for weather and google
 HTTPClient http;
-WiFiClient client;
+WiFiClientSecure client;
 
 // include all the helpers
 #include "Icons.h"
@@ -211,7 +212,9 @@ WiFiClient client;
 /////////////////////////////// Setup /////////////////////////////////////////////////////////////////////////
 void setup() {
 
-	M5.begin(false, false, true, true, false);
+	//M5.begin(false, false, true, true, false);
+	M5.begin();
+	M5.SHT30.Begin();
 
 	// Serial is initialised by M5.begin to 115200 baud
 	Serial.print("\nM5PaperCalendarWeatherClock started.\n");
@@ -219,9 +222,6 @@ void setup() {
 	if (!SPIFFS.begin(true)) {
 		Serial.println("SPIFFS Mount Failed");
 	}
-
-	M5.SHT30.Begin();
-	M5.RTC.begin();
 
 	M5.EPD.SetRotation(0);
 	M5.TP.SetRotation(0);
@@ -263,6 +263,8 @@ void setup() {
 	myToday.pushCanvas(0, 0, UPDATE_MODE_GC16);
 	myToday.deleteCanvas();
 	printFrame();
+
+	getSHT30Values();
 
 }
 ///////////////////// End Setup /////////////////////////////////////////////////////////////////////////

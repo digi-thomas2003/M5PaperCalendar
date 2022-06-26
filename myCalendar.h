@@ -187,6 +187,8 @@ void showClock() {
 }
 
 bool readCalendar() {
+	//WiFiClient client;
+	//HTTPClient http;
 
 	// Getting calendar from google script
 	Serial.println("Getting calendar");
@@ -194,10 +196,13 @@ bool readCalendar() {
 
 	if (!checkWiFi()) connectWiFi();
 
+	//client.stop();
 	http.end();
+	http.setTimeout(20000);
 	http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
 	if (!http.begin(calendarRequest)) {
 		Serial.println("Cannot connect to google script");
+		//client.stop();
 		http.end();
 		return false;
 	}
@@ -206,7 +211,7 @@ bool readCalendar() {
 	int returnCode = http.GET();
 	Serial.print("Returncode: ");
 	Serial.println(returnCode);
-	if (returnCode != HTTP_CODE_OK) return false;
+	//if (returnCode != HTTP_CODE_OK) return false;
 
 	String response = http.getString();
 	Serial.print("Response: ");
@@ -274,6 +279,7 @@ bool readCalendar() {
 			}
 		}
 	}
+	//client.stop();
 	http.end();
 	Serial.println("Calendar read!");
 	return true;

@@ -94,24 +94,6 @@ String getHourMinString(time_t rawtime) {
 	return (String)buff;
 }
 
-/* Convert the date part of the RTC timestamp */
-String getRTCDateString() {
-	char       buff[32];
-	rtc_date_t date_struct;
-	M5.RTC.getDate(&date_struct);
-	sprintf(buff, "%02d.%02d.%04d",	date_struct.day, date_struct.mon, date_struct.year);
-	return (String)buff;
-}
-
-/* Convert the time part of the RTC timestamp */
-String getRTCTimeString() {
-	char       buff[32];
-	rtc_time_t time_struct;
-	M5.RTC.getTime(&time_struct);
-	sprintf(buff, "%02d:%02d", time_struct.hour, time_struct.min);
-	return (String)buff;
-}
-
 /* Convert the time_t to the date part MM/DD */
 String getShortDayOfWeekString(time_t rawtime) {
 	return (String)dayShortNamesDD[weekday(rawtime)-1];
@@ -119,12 +101,12 @@ String getShortDayOfWeekString(time_t rawtime) {
 
 
 /* Read the SHT30 environment chip data */
-bool getSHT30Values() {
+void getSHT30Values() {
 	M5.SHT30.UpdateData();
 	if (M5.SHT30.GetError() == 0) {
 		sht30Temperatur = (int)M5.SHT30.GetTemperature();
 		sht30Humidity = (int)M5.SHT30.GetRelHumidity();
-		return true;
+		// return true;
 	}
-	return false;
+	// return false;
 }

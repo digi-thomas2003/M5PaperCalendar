@@ -68,7 +68,7 @@ bool Fill(const JsonObject& root) {
 	weather.hourlyTime[0] = LocalTime(root["current"]["dt"].as<int>());
 	weather.hourlyMaxTemp[0] = root["current"]["temp"].as<float>();
 	weather.hourlyMain[0] = root["current"]["weather"][0]["description"].as<char*>();
-	weather.hourlyRain[0] = root["current"]["rain"]["1h"].as<float>();
+	weather.hourlyRain[0] = max(root["current"]["rain"]["1h"].as<float>(), root["current"]["snow"]["1h"].as<float>());
 	weather.hourlyPop[0] = root["current"]["pop"].as<float>() * 100;
 	weather.hourlyPressure[0] = root["current"]["pressure"].as<float>();
 	weather.hourlyIcon[0] = root["current"]["weather"][0]["icon"].as<char*>();
@@ -77,7 +77,7 @@ bool Fill(const JsonObject& root) {
 			weather.hourlyTime[i] = LocalTime(hourly_list[i - 1]["dt"].as<int>());
 			weather.hourlyMaxTemp[i] = hourly_list[i - 1]["temp"].as<float>();
 			weather.hourlyMain[i] = hourly_list[i - 1]["weather"][0]["description"].as<char*>();
-			weather.hourlyRain[i] = hourly_list[i - 1]["rain"]["1h"].as<float>();
+			weather.hourlyRain[i] = max(hourly_list[i - 1]["rain"]["1h"].as<float>(), hourly_list[i - 1]["snow"]["1h"].as<float>());
 			weather.hourlyPop[i] = hourly_list[i - 1]["pop"].as<float>() * 100;
 			weather.hourlyPressure[i] = hourly_list[i - 1]["pressure"].as<float>();
 			weather.hourlyIcon[i] = hourly_list[i - 1]["weather"][0]["icon"].as<char*>();
@@ -99,7 +99,7 @@ bool Fill(const JsonObject& root) {
 			weather.forecastTime[i] = LocalTime(dayly_list[i]["dt"].as<int>());
 			weather.forecastMaxTemp[i] = dayly_list[i]["temp"]["max"].as<float>();
 			weather.forecastMinTemp[i] = dayly_list[i]["temp"]["min"].as<float>();
-			weather.forecastRain[i] = dayly_list[i]["rain"].as<float>();
+			weather.forecastRain[i] = max(dayly_list[i]["rain"].as<float>(), dayly_list[i]["snow"].as<float>());
 			weather.forecastPop[i] = dayly_list[i]["pop"].as<float>() * 100;
 			weather.forecastPressure[i] = dayly_list[i]["pressure"].as<float>();
 			weather.forecastIcon[i] = dayly_list[i]["weather"][0]["icon"].as<char*>();
@@ -278,13 +278,18 @@ void drawWindInfo(int x, int y, int dx, int dy)
 
 /* Draw the M5Paper environment and RTC information */
 void drawM5PaperInfo(int x, int y, int dx, int dy) {
+	char timeString[10];
+	char dateString[12];
+
 	myWeather.setTextSize(36);
 	myWeather.drawCentreString("Innen", x + dx / 2, y + 5, 1);
 	myWeather.drawLine(x, y + 35, x + dx, y + 35, MYBLACK);
 
 	myWeather.setTextSize(36);
-	myWeather.drawCentreString(getRTCDateString(), x + dx / 2, y + 50, 1);
-	myWeather.drawCentreString(getRTCTimeString(), x + dx / 2, y + 90, 1);
+	sprintf(timeString, "%02d:%02d", tm.tm_hour, tm.tm_min);
+	myWeather.drawCentreString(timeString, x + dx / 2, y + 50, 1);
+	sprintf(dateString, "%02d.%02d.%04d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+	myWeather.drawCentreString(dateString, x + dx / 2, y + 90, 1);
 	myWeather.setTextSize(24);
 
 	myWeather.setTextSize(36);
@@ -305,7 +310,12 @@ void drawDaily(int x, int y, int dx, int dy, Weather& weather, int index) {
 	String icon = weather.forecastIcon[index];
 
 	myWeather.setTextSize(24);
+	if (weekday(time) == 1 || weekday(time) == 7) {
+		myWeather.setTextColor(MYBLACK, M5EPD_Canvas::G2);
+		myWeather.fillRect(x + 1, y + 1, dx - 1, 31, M5EPD_Canvas::G2);
+	}
 	myWeather.drawCentreString(index == 0 ? "Heute" : getShortDayOfWeekString(time), x + dx / 2, y + 5, 1);
+	myWeather.setTextColor(MYBLACK, MYWHITE);
 
 	int iconX = x + dx / 2 - 32;
 	int iconY = y + 20;
@@ -335,7 +345,7 @@ void drawDaily(int x, int y, int dx, int dy, Weather& weather, int index) {
 }
 
 /* Draw a graph with x- and y-axis and values */
-void drawGraph(int x, int y, int dx, int dy, String title, int xMin, int xMax, int yMin, int yMax, float values[], float values2[]) {
+void drawGraph(int x, int y, int dx, int dy, String title, int xMin, int xMax, int yMin, int yMax, float values[], float values2[], float nightZone1 = 0, float nightZone2 = 0) {
 	String yMinString = String(yMin);
 	String yMaxString = String(yMax);
 	int    textWidth = 5 + max(yMinString.length() * 3.5, yMaxString.length() * 3.5);
@@ -355,6 +365,13 @@ void drawGraph(int x, int y, int dx, int dy, String title, int xMin, int xMax, i
 	myWeather.drawString(yMinString, x + 5, graphY + graphDY - 3);
 	for (int i = 0; i <= xMax; i++) {
 		myWeather.drawString(String(i), graphX + i * xStep, graphY + graphDY + 5);
+	}
+
+	if (nightZone1 > 0) {
+		myWeather.fillRect(graphX, graphY, nightZone1 * (float)graphDX / 12.F, graphDY, M5EPD_Canvas::G1);
+	}
+	if (nightZone2 > 0) {
+		myWeather.fillRect(max(graphX + graphDX - nightZone2 * (float)graphDX / 12.F, (float)graphX), graphY, min(nightZone2 * (float)graphDX / 12.F, (float)graphDX), graphDY, M5EPD_Canvas::G1);
 	}
 
 	myWeather.drawRect(graphX, graphY, graphDX, graphDY, MYBLACK);
@@ -409,7 +426,7 @@ void drawGraph(int x, int y, int dx, int dy, String title, int xMin, int xMax, i
 }
 
 /* Draw a dual graph */
-void drawDualGraph(int x, int y, int dx, int dy, String title, int xMin, int xMax, int yMin, int yMax, float values[], int offset, int yMinB, int yMaxB, float valuesB[]) {
+void drawDualGraph(int x, int y, int dx, int dy, String title, int xMin, int xMax, int yMin, int yMax, float values[], int offset, int yMinB, int yMaxB, float valuesB[], float nightZone1 = 0, float nightZone2 = 0) {
 	String yMinString = String(yMinB);
 	String yMaxString = String(yMaxB);
 	int    textWidth = 5 + max(yMinString.length() * 3.5, yMaxString.length() * 3.5);
@@ -429,6 +446,13 @@ void drawDualGraph(int x, int y, int dx, int dy, String title, int xMin, int xMa
 	myWeather.drawString(yMinString, x + 5, graphY + graphDY - 3);
 	for (int i = 0; i <= xMax; i++) {
 		myWeather.drawString(String(i), graphX + i * xStep, graphY + graphDY + 5);
+	}
+
+	if (nightZone1 > 0) {
+		myWeather.fillRect(graphX, graphY, nightZone1 * (float)graphDX / 12.F, graphDY, M5EPD_Canvas::G1);
+	}
+	if (nightZone2 > 0) {
+		myWeather.fillRect(max(graphX + graphDX - nightZone2 * (float)graphDX / 12.F, (float)graphX), graphY, min(nightZone2 * (float)graphDX / 12.F, (float)graphDX), graphDY, M5EPD_Canvas::G1);
 	}
 
 	myWeather.drawRect(graphX, graphY, graphDX, graphDY, MYBLACK);
@@ -515,10 +539,18 @@ void showWeather() {
 		drawDaily(x, 286, 116, 122, weather, i);
 		myWeather.drawLine(x, 286, x, 408, MYBLACK);
 	}
+
+	float hoursUntilSunlize = 0, hoursAfterSunset = 0;
+	if (weather.currentTime < weather.sunrise) {
+		hoursUntilSunlize = (weather.sunrise - weather.currentTime) / 3600.0;
+	}
+	if (weather.currentTime + 12 * 60 * 60 > weather.sunset) {
+		hoursAfterSunset = (weather.currentTime + 12 * 60 * 60 - weather.sunset) / 3600.0;
+	}
 	myWeather.drawRect(15, 286, maxX - 30, 122, MYBLACK);
 
-	drawGraph(15, 408, 232, 122, "Temp 12h (C)", 0, 12, weather.hourlyTempRange[0], weather.hourlyTempRange[1], weather.hourlyMaxTemp, NULL);
-	drawDualGraph(247, 408, 232, 122, "Regen 12h (mm/%)", 0, 12, 0, 100, weather.hourlyPop, 1, 0, weather.hourlyMaxRain, weather.hourlyRain);
+	drawGraph(15, 408, 232, 122, "Temp 12h (C)", 0, 12, weather.hourlyTempRange[0], weather.hourlyTempRange[1], weather.hourlyMaxTemp, NULL, hoursUntilSunlize, hoursAfterSunset);
+	drawDualGraph(247, 408, 232, 122, "Regen 12h (mm/%)", 0, 12, 0, 100, weather.hourlyPop, 1, 0, weather.hourlyMaxRain, weather.hourlyRain, hoursUntilSunlize, hoursAfterSunset);
 	myWeather.drawLine(480, 408, 480, 530, MYBLACK);
 	drawGraph(481, 408, 232, 122, "Temp 7Tage (C)", 0, 7, weather.forecastTempRange[0], weather.forecastTempRange[1], weather.forecastMinTemp, weather.forecastMaxTemp);
 	drawDualGraph(713, 408, 232, 122, "Regen 7Tage (mm/%)", 0, 7, 0, 100, weather.forecastPop, 0, 0, weather.forecastMaxRain, weather.forecastRain);
