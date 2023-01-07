@@ -49,6 +49,7 @@
   V0.7  23.12.2021: Added the next event to today page
   V0.8  29.12.2021: Changed time - no more using the rtc because time is synced with ntp time server every new day
   V0.9  03.04.2022: Some minor improvements on the weather page
+  V0.10 07.01.2023: Fix if first day of current month is a monday
 
 
   Important note:
@@ -61,7 +62,7 @@
 
  *********************************************************************/
 
-#define FIRMWARE "0.9 - 2022-04-03"
+#define FIRMWARE "0.10 - 2023-01-07"
 
  /**************************************************************************************
  **     Libraries

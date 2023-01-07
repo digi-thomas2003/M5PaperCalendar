@@ -64,6 +64,8 @@ void miniCalendar() {
 	int virtCurCount = getDaysInMonth(tm.tm_mon + 1, tm.tm_year + 1900);
 	int virt1wd = getDayOfWeek(tm.tm_year + 1900, tm.tm_mon + 1, 1);
 
+	if (virt1wd == 0) virt1wd = 7;                  // if first day of current month is sunday
+
 	sideBar.setTextSize(18);
 
 	uint8_t virtMon[42];                            // create a virtual month with 42 days - 6 rows with 7 columns

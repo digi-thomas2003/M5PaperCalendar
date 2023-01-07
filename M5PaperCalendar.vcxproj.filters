@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="M5PaperCalendar.ino" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="__vm\.M5PaperCalendar.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -39,5 +36,8 @@
     <ClInclude Include="myWiFi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="M5PaperCalendar.ino" />
   </ItemGroup>
 </Project>

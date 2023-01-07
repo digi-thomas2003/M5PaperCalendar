@@ -161,7 +161,7 @@ void printNextEvent() {
 
 	Serial.println("Calendar OK? " + String(rTC));
 
-	tmElements_t currentNow = { 0, tm.tm_min, tm.tm_hour, 0, tm.tm_mday, tm.tm_mon, tm.tm_year + 1900 };
+	tmElements_t currentNow = { 0, tm.tm_min, tm.tm_hour, 0, tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900 };
 	time_t currentNowTime = makeTime(currentNow);
 
 	//Serial.println("CurrentNow: " + String(currentNowTime));

@@ -67,20 +67,20 @@ bool Fill(const JsonObject& root) {
 	JsonArray hourly_list = root["hourly"];
 	weather.hourlyTime[0] = LocalTime(root["current"]["dt"].as<int>());
 	weather.hourlyMaxTemp[0] = root["current"]["temp"].as<float>();
-	weather.hourlyMain[0] = root["current"]["weather"][0]["description"].as<char*>();
+	weather.hourlyMain[0] = root["current"]["weather"][0]["description"].as<String>();
 	weather.hourlyRain[0] = max(root["current"]["rain"]["1h"].as<float>(), root["current"]["snow"]["1h"].as<float>());
 	weather.hourlyPop[0] = root["current"]["pop"].as<float>() * 100;
 	weather.hourlyPressure[0] = root["current"]["pressure"].as<float>();
-	weather.hourlyIcon[0] = root["current"]["weather"][0]["icon"].as<char*>();
+	weather.hourlyIcon[0] = root["current"]["weather"][0]["icon"].as<String>();
 	for (int i = 1; i < MAX_HOURLY; i++) {
 		if (i < hourly_list.size()) {
 			weather.hourlyTime[i] = LocalTime(hourly_list[i - 1]["dt"].as<int>());
 			weather.hourlyMaxTemp[i] = hourly_list[i - 1]["temp"].as<float>();
-			weather.hourlyMain[i] = hourly_list[i - 1]["weather"][0]["description"].as<char*>();
+			weather.hourlyMain[i] = hourly_list[i - 1]["weather"][0]["description"].as<String>();
 			weather.hourlyRain[i] = max(hourly_list[i - 1]["rain"]["1h"].as<float>(), hourly_list[i - 1]["snow"]["1h"].as<float>());
 			weather.hourlyPop[i] = hourly_list[i - 1]["pop"].as<float>() * 100;
 			weather.hourlyPressure[i] = hourly_list[i - 1]["pressure"].as<float>();
-			weather.hourlyIcon[i] = hourly_list[i - 1]["weather"][0]["icon"].as<char*>();
+			weather.hourlyIcon[i] = hourly_list[i - 1]["weather"][0]["icon"].as<String>();
 			if (weather.hourlyRain[i] > weather.hourlyMaxRain) {
 				weather.hourlyMaxRain = weather.hourlyRain[i] + 4;
 			}
@@ -102,7 +102,7 @@ bool Fill(const JsonObject& root) {
 			weather.forecastRain[i] = max(dayly_list[i]["rain"].as<float>(), dayly_list[i]["snow"].as<float>());
 			weather.forecastPop[i] = dayly_list[i]["pop"].as<float>() * 100;
 			weather.forecastPressure[i] = dayly_list[i]["pressure"].as<float>();
-			weather.forecastIcon[i] = dayly_list[i]["weather"][0]["icon"].as<char*>();
+			weather.forecastIcon[i] = dayly_list[i]["weather"][0]["icon"].as<String>();
 		}
 		if (weather.forecastRain[i] > weather.forecastMaxRain) {
 			weather.forecastMaxRain = weather.forecastRain[i] + 4;
